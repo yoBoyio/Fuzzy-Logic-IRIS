@@ -14,14 +14,40 @@ training_targets = training_set(:,5)
 testing_data = testing_set(:,1:4)
 testing_targets = testing_set(:,5)
 
-fis = genfis(training_data,training_targets);
+opt2 = genfisOptions('FCMClustering');
+opt2.NumClusters = 3;
+fis = genfis(training_data,training_targets,opt2);
 
 [trainFis, trainError, stepSize, checkFis, checkError] = ...
-    anfis(training_set, fis, 8000, [], testing_set);
+    anfis(training_set, fis,100,  [], testing_set);
 
 
-trainFisOut = round(evalfis(testing_data, trainFis));
+trainFisOut = round(evalfis(trainFis,testing_data));
 
-badCheckFis = size(find((trainFisOut == testing_targets) == 0), 1);
+failed_tests = size(find((trainFisOut == testing_targets) == 0), 1);
+fail_rate_percentage = round((failed_tests/75)*100)
+test = [trainFisOut(:),testing_targets(:),trainFisOut(:)~=testing_targets(:)]
 
-test = [trainFisOut(:),testing_targets(:)]
+plot(trainFisOut)
+hold on
+plot(testing_targets,'o')
+hold off
+
+showrule(fis)
+
+[x,mf] = plotmf(fis,'input',1);
+subplot(2,2,1)
+plot(x,mf)
+xlabel('Membership Functions for Input 1')
+[x,mf] = plotmf(fis,'input',2);
+subplot(2,2,2)
+plot(x,mf)
+xlabel('Membership Functions for Input 2')
+[x,mf] = plotmf(fis,'input',3);
+subplot(2,2,3)
+plot(x,mf)
+xlabel('Membership Functions for Input 3')
+[x,mf] = plotmf(fis,'input',4);
+subplot(2,2,4)
+plot(x,mf)
+xlabel('Membership Functions for Input 4')
