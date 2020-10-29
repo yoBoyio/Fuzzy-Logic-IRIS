@@ -49,6 +49,7 @@ hold off
 
 showrule(fis)
 
+f = figure(2); %to show the 2 figures into different windows
 [x,mf] = plotmf(fis,'input',1);
 subplot(2,2,1)
 plot(x,mf)
