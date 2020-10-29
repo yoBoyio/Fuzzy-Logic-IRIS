@@ -15,24 +15,18 @@ training_targets = training_set(:,5)
 testing_data = testing_set(:,1:4)
 testing_targets = testing_set(:,5)
 
-%fuzzy c-means
 opt2 = genfisOptions('FCMClustering');
 opt2.NumClusters = 3;
 fis = genfis(training_data,training_targets,opt2);
 
 
-%substractive clustering
-fis2 = genfis2(training_data,training_targets,RADIUS,[min(iris); max(iris)]);
-
-%gridpartition
-opt2 = genfisOptions('GridPartition');
-opt2.NumMembershipFunctions = 3;
-fis3 = genfis(training_data,training_targets,opt2);
-
-
  [trainFis, trainError, stepSize, checkFis, checkError] = ...
     anfis(training_set, fis,100,  [], testing_set);
 
+%gridpartition
+opt3 = genfisOptions('GridPartition');
+opt3.NumClusters = 3;
+fis2 = genfis(training_data,training_targets,opt2);
 
 
 trainFisOut = round(evalfis(trainFis,testing_data));
@@ -51,16 +45,16 @@ showrule(fis)
 [x,mf] = plotmf(fis,'input',1);
 subplot(2,2,1)
 plot(x,mf)
-xlabel('Μήκος Σεπάλων')
+xlabel('Membership Functions for Input 1')
 [x,mf] = plotmf(fis,'input',2);
 subplot(2,2,2)
 plot(x,mf)
-xlabel('Πλάτος Σεπάλων')
+xlabel('Membership Functions for Input 2')
 [x,mf] = plotmf(fis,'input',3);
 subplot(2,2,3)
 plot(x,mf)
-xlabel('Μήκος Πετάλων')
+xlabel('Membership Functions for Input 3')
 [x,mf] = plotmf(fis,'input',4);
 subplot(2,2,4)
 plot(x,mf)
-xlabel('Πλάτος Πετάλων')
+xlabel('Membership Functions for Input 4')
