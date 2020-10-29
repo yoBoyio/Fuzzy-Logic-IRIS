@@ -38,16 +38,16 @@ showrule(fis)
 [x,mf] = plotmf(fis,'input',1);
 subplot(2,2,1)
 plot(x,mf)
-xlabel('Membership Functions for Input 1')
+xlabel('Μήκος Σεπάλων')
 [x,mf] = plotmf(fis,'input',2);
 subplot(2,2,2)
 plot(x,mf)
-xlabel('Membership Functions for Input 2')
+xlabel('Πλάτος Σεπάλων')
 [x,mf] = plotmf(fis,'input',3);
 subplot(2,2,3)
 plot(x,mf)
-xlabel('Membership Functions for Input 3')
+xlabel('Μήκος Πετάλων')
 [x,mf] = plotmf(fis,'input',4);
 subplot(2,2,4)
 plot(x,mf)
-xlabel('Membership Functions for Input 4')
+xlabel('Πλάτος Πετάλων')
