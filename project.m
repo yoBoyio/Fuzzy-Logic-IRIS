@@ -1,6 +1,7 @@
 clear 
 load iris.dat
-RADIUS=0.8;
+load clusterdemo.dat
+
 % Πρώτα 25 στοιχεία κάθε κλάσης
 training_set = iris(1:25,:)
 training_set = cat(1,iris(51:75,:),training_set)
@@ -22,7 +23,9 @@ fis2= genfis(training_data,training_targets,opt2);
 
 
 %substractive clustering
-fis = genfis2(training_data,training_targets,RADIUS,[min(iris); max(iris)]);
+opt= genfisOptions('SubtractiveClustering');
+C = subclust(clusterdemo,0.8);
+fis= genfis(training_data,training_targets,opt);
 
 %gridpartition
 opt2 = genfisOptions('GridPartition');
@@ -32,8 +35,6 @@ fis3 = genfis(training_data,training_targets,opt2);
 
  [trainFis, trainError, stepSize, checkFis, checkError] = ...
     anfis(training_set, fis,100,  [], testing_set);
-
-
 
 trainFisOut = round(evalfis(trainFis,testing_data));
 
