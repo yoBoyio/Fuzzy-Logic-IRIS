@@ -1,6 +1,6 @@
 clear 
 load iris.dat
-
+RADIUS=0.8;
 % Πρώτα 25 στοιχεία κάθε κλάσης
 training_set = iris(1:25,:)
 training_set = cat(1,iris(51:75,:),training_set)
@@ -18,11 +18,11 @@ testing_targets = testing_set(:,5)
 %fuzzy c-means
 opt2 = genfisOptions('FCMClustering');
 opt2.NumClusters = 3;
-fis = genfis(training_data,training_targets,opt2);
+fis2= genfis(training_data,training_targets,opt2);
 
 
 %substractive clustering
-fis2 = genfis2(training_data,training_targets,RADIUS,[min(iris); max(iris)]);
+fis = genfis2(training_data,training_targets,RADIUS,[min(iris); max(iris)]);
 
 %gridpartition
 opt2 = genfisOptions('GridPartition');
