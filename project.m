@@ -12,6 +12,7 @@ testing_set = iris(26:50,:);
 testing_set = cat(1,iris(76:100,:),testing_set);
 testing_set = cat(1,iris(126:150,:),testing_set);
 
+% global variables, χρήση στις συναρτήσεις
 global training_data;
 global training_targets;
 global testing_data;
@@ -21,24 +22,30 @@ training_targets = training_set(:,5);
 testing_data = testing_set(:,1:4);
 testing_targets = testing_set(:,5);
 
-global figure_index;
-figure_index=0;
+global results;
+results = {};
+
 fcm();
 substractive();
 gridpartition();
+results
+
 %------ Functions ------
 
-
 %evalute algorithm
-function evaluate_algorithm(fis)
+function evaluate_algorithm(fis,algo_title)
+global results;
 global testing_data;
 global testing_targets;
-global figure_index;
 trainFis = train_algorithm(fis,100);
 output = round(evalfis(trainFis,testing_data));
-[success_rate,successful] = get_success_results(output);
-plotClassification(output);
-plotInputs(fis);
+
+[successful,success_rate] =get_success_results(output);
+success_results = {algo_title,successful,success_rate};
+results = [results;success_results];
+
+plotClassification(output,algo_title,successful);
+plotInputs(fis,algo_title);
 end
 
 %train algorithm
@@ -51,45 +58,42 @@ end
 
 
 %plot inputs
-function plotInputs(fis)
-global figure_index;
-figure_index = figure_index+1;
-figure(figure_index);
+function plotInputs(fis,algo_title)
+figure('Name',strcat('Membership Function graphs using ',algo_title));
 [x,mf] = plotmf(fis,'input',1);
-subplot(2,2,1)
-plot(x,mf)
-xlabel('Μήκος Σεπάλων')
+subplot(2,2,1);
+plot(x,mf);
+xlabel('Μήκος Σεπάλων');
 [x,mf] = plotmf(fis,'input',2);
-subplot(2,2,2)
-plot(x,mf)
-xlabel('Πλάτος Σεπάλων')
+subplot(2,2,2);
+plot(x,mf);
+xlabel('Πλάτος Σεπάλων');
 [x,mf] = plotmf(fis,'input',3);
-subplot(2,2,3)
-plot(x,mf)
-xlabel('Μήκος Πετάλων')
+subplot(2,2,3);
+plot(x,mf);
+xlabel('Μήκος Πετάλων');
 [x,mf] = plotmf(fis,'input',4);
-subplot(2,2,4)
-plot(x,mf)
-xlabel('Πλάτος Πετάλων')
+subplot(2,2,4);
+plot(x,mf);
+xlabel('Πλάτος Πετάλων');
 end
 
 %success rate
-function [success_rate,successful] = get_success_results(output)
+function [successful,success_rate] = get_success_results(output)
 global testing_targets;
-successful = size(find((output == testing_targets) == 0), 1);
-success_rate = round((successful/75)*100);
+successful = size(find((output == testing_targets) == 1), 1);
+success_rate = sprintf("%d %%",round((successful/75)*100));
 end
 
 %plot classification
-function plotClassification(output)
-global figure_index;
-figure_index = figure_index+1;
-figure(figure_index);
+function plotClassification(output,algo_title,successful)
+figure('Name','Classification success plot');
 global testing_targets;
-plot(output)
+plot(output,'x');
 hold on
-plot(testing_targets,'o')
+plot(testing_targets,'o');
 hold off
+title(strcat(algo_title,sprintf(' successful classifications: %d out of 75',successful)));
 end
 
 %fuzzy c-means
@@ -102,9 +106,9 @@ fis = genfis(training_data,training_targets,opts);
 end 
 
 %fuzzy c-means RUN
-function [success_rate,successful] = fcm()
+function fcm()
 fis = fcm_fis();
-evaluate_algorithm(fis);
+evaluate_algorithm(fis,'FCM');
 end
 
 
@@ -118,22 +122,22 @@ fis = genfis(training_data,training_targets,opts);
 end
 
 %gridpartition RUN
-function [success_rate,successful] = gridpartition(figure_index)
+function gridpartition()
 fis = gridpartition_fis();
-evaluate_algorithm(fis);
+evaluate_algorithm(fis,'gridPartition');
 end
 
 %substractive clustering
 function fis = substractive_fis()
 global training_data;
 global training_targets;
-opts= genfisOptions('SubtractiveClustering');
+opts = genfisOptions('SubtractiveClustering');
 fis= genfis(training_data,training_targets,opts);
 end
 
 %substractive clustering RUN
-function [success_rate,successful] = substractive(figure_index)
+function substractive()
 fis = substractive_fis();
-evaluate_algorithm(fis);
+evaluate_algorithm(fis,'substractiveClustering');
 end
 
