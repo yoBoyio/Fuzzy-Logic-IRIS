@@ -23,14 +23,16 @@ testing_data = testing_set(:,1:4);
 testing_targets = testing_set(:,5);
 
 
-% Αρχικοποίηση Cell για την αποθήκευση αριθμητικών αποτελεσμάτων
+% Αρχικοποίηση Table για την αποθήκευση αριθμητικών αποτελεσμάτων
 global results;
-results = {};
+global table_columns;
+table_columns = {'Method','Successful Prediction','Success Rate','Total Rules'};
+results = table()
 
 % Κλήση αλγορίθμων
 fcm();
-gridpartition();
 substractive();
+gridpartition();
 
 % Εμφάνιση αριθμητικών αποτελεσμάτων για σύγκριση
 results
@@ -39,59 +41,62 @@ results
 
 %evalute algorithm
 function evaluate_algorithm(fis,algo_title)
-global results;
-global testing_data;
-global testing_targets;
+    global results;
+    global table_columns;
+    global testing_data;
+    global testing_targets;
 
-% Εκπαίδευση 
-trainFis = train_algorithm(fis,100);
+    % Εκπαίδευση 
+    trainFis = train_algorithm(fis,100);
 
-% Έξοδος αποτελεσμάτων νευρώνα στα testing δεδομένα
-output = round(evalfis(trainFis,testing_data));
+    % Έξοδος αποτελεσμάτων νευρώνα στα testing δεδομένα
+    output = round(evalfis(trainFis,testing_data));
 
-[successful,success_rate] =get_success_results(output);
+    [successful,success_rate] =get_success_results(output);
 
-% format 
-success_results = {algo_title,successful,success_rate};
+    % format 
+    rules = showrule(fis);
+    total_rules = size(rules,1);
+    success_results = cell2table({algo_title,successful,success_rate,total_rules},'VariableNames',table_columns);
 
-% Αποθήκευση αριθμητικών αποτελεσμάτων
-results = [results;success_results];
+    % Αποθήκευση αριθμητικών αποτελεσμάτων
+    results = [results;success_results];
 
-% Εμφάνιση γραφημάτων
-plotClassification(output,algo_title,successful);
-plotInputs(fis,algo_title);
-end
+    % Εμφάνιση γραφημάτων
+    plotClassification(output,algo_title,successful);
+    plotInputs(fis,algo_title);
+    end
 
-%train algorithm
-function trainfis = train_algorithm(fis,epochs)
-global testing_set;
-global training_set;
+    %train algorithm
+    function trainfis = train_algorithm(fis,epochs)
+    global testing_set;
+    global training_set;
 
-% Εκπαίδευση Νευρώνα
-trainfis  = ...
-    anfis(training_set, fis,epochs,  [], testing_set);
+    % Εκπαίδευση Νευρώνα
+    trainfis  = ...
+        anfis(training_set, fis,epochs,  [], testing_set);
 end
 
 
 %plot inputs
 function plotInputs(fis,algo_title)
-figure('Name',strcat('Membership Function graphs using ',algo_title));
-[x,mf] = plotmf(fis,'input',1);
-subplot(2,2,1);
-plot(x,mf);
-xlabel('Μήκος Σεπάλων');
-[x,mf] = plotmf(fis,'input',2);
-subplot(2,2,2);
-plot(x,mf);
-xlabel('Πλάτος Σεπάλων');
-[x,mf] = plotmf(fis,'input',3);
-subplot(2,2,3);
-plot(x,mf);
-xlabel('Μήκος Πετάλων');
-[x,mf] = plotmf(fis,'input',4);
-subplot(2,2,4);
-plot(x,mf);
-xlabel('Πλάτος Πετάλων');
+    figure('Name',strcat('Membership Function graphs using ',algo_title));
+    [x,mf] = plotmf(fis,'input',1);
+    subplot(2,2,1);
+    plot(x,mf);
+    xlabel('Μήκος Σεπάλων');
+    [x,mf] = plotmf(fis,'input',2);
+    subplot(2,2,2);
+    plot(x,mf);
+    xlabel('Πλάτος Σεπάλων');
+    [x,mf] = plotmf(fis,'input',3);
+    subplot(2,2,3);
+    plot(x,mf);
+    xlabel('Μήκος Πετάλων');
+    [x,mf] = plotmf(fis,'input',4);
+    subplot(2,2,4);
+    plot(x,mf);
+    xlabel('Πλάτος Πετάλων');
 end
 
 %success rate
@@ -131,7 +136,7 @@ function fis = fcm_fis()
     %fuzzy c-means RUN
     function fcm()
     fis = fcm_fis();
-    evaluate_algorithm(fis,'FCM');
+    evaluate_algorithm(fis,"FCM");
 end
 
 
@@ -149,7 +154,7 @@ end
 %gridpartition RUN
 function gridpartition()
     fis = gridpartition_fis();
-    evaluate_algorithm(fis,'gridPartition');
+    evaluate_algorithm(fis,"grid Partition");
 end
 
 %substractive clustering
@@ -163,6 +168,6 @@ end
 %substractive clustering RUN
 function substractive()
     fis = substractive_fis();
-    evaluate_algorithm(fis,'substractiveClustering');
+    evaluate_algorithm(fis,"substractive Clustering");
 end
 
