@@ -30,9 +30,9 @@ table_columns = {'Method','Successful Prediction','Success Rate','Total Rules'};
 results = table()
 
 % Κλήση αλγορίθμων
-fcm();
-substractive();
 gridpartition();
+fcm();
+subtractive();
 
 % Εμφάνιση αριθμητικών αποτελεσμάτων για σύγκριση
 results
@@ -46,13 +46,13 @@ function evaluate_algorithm(fis,algo_title)
     global testing_data;
     global testing_targets;
 
-    % Εκπαίδευση 
-    trainFis = train_algorithm(fis,100);
+    fis = train_neuron(fis,150);
 
-    % Έξοδος αποτελεσμάτων νευρώνα στα testing δεδομένα
-    output = round(evalfis(trainFis,testing_data));
 
-    [successful,success_rate] =get_success_results(output);
+    % Έξοδος αποτελεσμάτων στα testing δεδομένα
+    output = round(evalfis(fis,testing_data));
+
+    [successful,success_rate] = get_success_results(output);
 
     % format 
     rules = showrule(fis);
@@ -67,15 +67,6 @@ function evaluate_algorithm(fis,algo_title)
     plotInputs(fis,algo_title);
     end
 
-    %train algorithm
-    function trainfis = train_algorithm(fis,epochs)
-    global testing_set;
-    global training_set;
-
-    % Εκπαίδευση Νευρώνα
-    trainfis  = ...
-        anfis(training_set, fis,epochs,  [], testing_set);
-end
 
 
 %plot inputs
@@ -133,19 +124,29 @@ function fis = fcm_fis()
     fis = genfis(training_data,training_targets,opts);
     end 
 
-    %fuzzy c-means RUN
-    function fcm()
+%fuzzy c-means RUN
+function fcm()
     fis = fcm_fis();
     evaluate_algorithm(fis,"FCM");
 end
 
+
+
+%train neuron
+function trainfis = train_neuron(fis,epochs)
+    global testing_set;
+    global training_set;
+
+    % Εκπαίδευση Νευρώνα
+    trainfis  = ...
+        anfis(training_set, fis,epochs,  [], testing_set);
+end
 
 %gridpartition
 function fis = gridpartition_fis()
     global training_data;
     global training_targets;
     opts = genfisOptions('GridPartition');
-
     % Συναρτήσεις συμμετοχής όσες και τύποι λουλουδιών
     opts.NumMembershipFunctions = 3;
     fis = genfis(training_data,training_targets,opts);
@@ -158,16 +159,18 @@ function gridpartition()
 end
 
 %substractive clustering
-function fis = substractive_fis()
+function fis = subtractive_fis()
     global training_data;
     global training_targets;
-    opts = genfisOptions('SubtractiveClustering');
-    fis= genfis(training_data,training_targets,opts);
+    % Χρήση Subtractive με Radius=0.6
+    opt = genfisOptions('SubtractiveClustering',...
+                    'ClusterInfluenceRange',0.6);
+    fis = genfis(training_data,training_targets,opt);
 end
 
 %substractive clustering RUN
-function substractive()
-    fis = substractive_fis();
+function subtractive()
+    fis = subtractive_fis();
     evaluate_algorithm(fis,"substractive Clustering");
 end
 
