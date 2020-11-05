@@ -40,13 +40,12 @@ results
 %------ Functions ------
 
 %evalute algorithm
-function evaluate_algorithm(fis,algo_title)
+function evaluate_algorithm(fis,algo_title,epochs)
     global results;
     global table_columns;
     global testing_data;
     global testing_targets;
-
-    fis = train_neuron(fis,150);
+    fis = train_neuron(fis,epochs);
 
 
     % Έξοδος αποτελεσμάτων στα testing δεδομένα
@@ -65,6 +64,14 @@ function evaluate_algorithm(fis,algo_title)
     % Εμφάνιση γραφημάτων
     plotClassification(output,algo_title,successful);
     plotInputs(fis,algo_title);
+
+
+    % Εμφάνιση κανόνων
+    fis.Inputs(1).Name = "Μήκος Σεπάλων";
+    fis.Inputs(2).Name = "Πλάτος Σεπάλων";
+    fis.Inputs(3).Name = "Μήκος Πεπάλων";
+    fis.Inputs(4).Name = "Πλάτος Πεπάλων";
+    ruleview(fis,algo_title);
     end
 
 
@@ -127,7 +134,7 @@ function fis = fcm_fis()
 %fuzzy c-means RUN
 function fcm()
     fis = fcm_fis();
-    evaluate_algorithm(fis,"FCM");
+    evaluate_algorithm(fis,"FCM",150);
 end
 
 
@@ -155,7 +162,7 @@ end
 %gridpartition RUN
 function gridpartition()
     fis = gridpartition_fis();
-    evaluate_algorithm(fis,"grid Partition");
+    evaluate_algorithm(fis,"grid Partition",200);
 end
 
 %substractive clustering
@@ -171,6 +178,6 @@ end
 %substractive clustering RUN
 function subtractive()
     fis = subtractive_fis();
-    evaluate_algorithm(fis,"substractive Clustering");
+    evaluate_algorithm(fis,"substractive Clustering",100);
 end
 
